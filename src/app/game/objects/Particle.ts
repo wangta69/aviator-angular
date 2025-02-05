@@ -36,14 +36,5 @@ export class Particle {
       _this.mesh.scale.set(1,1,1);
       this.parent.particlesPool.unshift(_this);
     }});
-    /*
-    TweenMax.to(this.mesh.rotation, speed, {x:Math.random()*12, y:Math.random()*12});
-    TweenMax.to(this.mesh.scale, speed, {x:.1, y:.1, z:.1});
-    TweenMax.to(this.mesh.position, speed, {x:targetX, y:targetY, delay:Math.random() *.1, ease:Power2.easeOut, onComplete:() =>{
-      if(_p) _p.remove(_this.mesh);
-      _this.mesh.scale.set(1,1,1);
-      this.parent.particlesPool.unshift(_this);
-    }});
-    */
   }
 }

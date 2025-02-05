@@ -1,6 +1,5 @@
 
 import * as THREE from 'three';
-import { Colors } from './Constants';
 export class Coin {
 
 private mesh;

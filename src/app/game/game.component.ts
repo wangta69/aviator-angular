@@ -1,11 +1,7 @@
 import { Component,OnInit,AfterViewInit,ViewChild,ElementRef } from '@angular/core';
-import * as GSAP from 'gsap';
 import * as THREE from 'three';
 
-import { Colors } from './objects/Constants';
-
 import { AirPlane } from './objects/AirPlane';
-
 import { Sea } from './objects/Sea';
 import { Sky } from './objects/Sky';
 import { CoinsHolder } from './objects/CoinsHolder';
@@ -86,12 +82,6 @@ export class GameComponent implements OnInit, AfterViewInit{
   ngAfterViewInit() {
     this.init();
   }
-
-
-
-///////////////
-
-
 
   private resetGame(){
     this.game = {
@@ -185,6 +175,7 @@ export class GameComponent implements OnInit, AfterViewInit{
     //camera.lookAt(new THREE.Vector3(0, 400, 0));
 
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    this.renderer.setClearColor( 0x000000, 0 );
     this.renderer.setSize(this.WIDTH, this.HEIGHT);
 
     this.renderer.shadowMap.enabled = true;
@@ -227,22 +218,19 @@ export class GameComponent implements OnInit, AfterViewInit{
     this.mousePos = {x:tx, y:ty};
   }
 
-  private handleMouseUp(event: any){
-  if (this.game.status == "waitingReplay"){
-    this.resetGame();
-    this.hideReplay();
-  }
-  }
-
-
-  private handleTouchEnd(event: any){
-  if (this.game.status == "waitingReplay"){
-    this.resetGame();
-    this.hideReplay();
-  }
+  private handleMouseUp(){
+    if (this.game.status == "waitingReplay"){
+      this.resetGame();
+      this.hideReplay();
+    }
   }
 
-
+  private handleTouchEnd(){
+    if (this.game.status == "waitingReplay"){
+      this.resetGame();
+      this.hideReplay();
+    }
+  }
 
   private createLights() {
 
@@ -262,13 +250,12 @@ export class GameComponent implements OnInit, AfterViewInit{
     this.shadowLight.shadow.mapSize.width = 4096;
     this.shadowLight.shadow.mapSize.height = 4096;
 
-    const ch = new THREE.CameraHelper(this.shadowLight.shadow.camera);
+    // const ch = new THREE.CameraHelper(this.shadowLight.shadow.camera);
 
     //scene.add(ch);
     this.scene.add(this.hemisphereLight);
     this.scene.add(this.shadowLight);
     this.scene.add(this.ambientLight);
-
   }
 
 
@@ -349,14 +336,13 @@ export class GameComponent implements OnInit, AfterViewInit{
         this.game.targetBaseSpeed = this.game.initSpeed + this.game.incrementSpeedByLevel*this.game.level
       }
 
-
       this.updatePlane();
       this.updateDistance();
       this.updateEnergy();
       this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.deltaTime * 0.02;
       this.game.speed = this.game.baseSpeed * this.game.planeSpeed;
 
-    }else if(this.game.status=="gameover"){
+    } else if(this.game.status=="gameover"){
       this.game.speed *= .99;
       this.airplane.mesh.rotation.z += (-Math.PI/2 - this.airplane.mesh.rotation.z)*.0002*this.deltaTime;
       this.airplane.mesh.rotation.x += 0.0003*this.deltaTime;
@@ -372,8 +358,10 @@ export class GameComponent implements OnInit, AfterViewInit{
 
     }
 
-
+    // 프로펠러 움직이기
     this.airplane.propeller.rotation.x +=.2 + this.game.planeSpeed * this.deltaTime*.005;
+
+    // 바다 움직이기
     this.sea.mesh.rotation.z += this.game.speed*this.deltaTime;//*game.seaRotationSpeed;
 
     if ( this.sea.mesh.rotation.z > 2*Math.PI)  this.sea.mesh.rotation.z -= 2*Math.PI;
@@ -395,10 +383,7 @@ export class GameComponent implements OnInit, AfterViewInit{
     this.fieldDistance.innerHTML = Math.floor(this.game.distance);
     const d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
     this.levelCircle.setAttribute("stroke-dashoffset", d);
-
   }
-
-  
 
   private updateEnergy(){
     this.game.energy -= this.game.speed*this.deltaTime*this.game.ratioSpeedEnergy;
@@ -427,8 +412,6 @@ export class GameComponent implements OnInit, AfterViewInit{
     this.game.energy = Math.max(0, this.game.energy);
   }
 
-
-
   private updatePlane(){
 
     this.game.planeSpeed = this.normalize(this.mousePos.x,-.5,.5,this.game.planeMinSpeed, this.game.planeMaxSpeed);
@@ -447,7 +430,7 @@ export class GameComponent implements OnInit, AfterViewInit{
 
     this.airplane.mesh.rotation.z = (targetY-this.airplane.mesh.position.y)*this.deltaTime*this.game.planeRotXSensivity;
     this.airplane.mesh.rotation.x = (this.airplane.mesh.position.y-targetY)*this.deltaTime*this.game.planeRotZSensivity;
-    const targetCameraZ = this.normalize(this.game.planeSpeed, this.game.planeMinSpeed, this.game.planeMaxSpeed, this.game.cameraNearPos, this.game.cameraFarPos);
+    // const targetCameraZ = this.normalize(this.game.planeSpeed, this.game.planeMinSpeed, this.game.planeMaxSpeed, this.game.cameraNearPos, this.game.cameraFarPos);
     this.camera.fov = this.normalize(this.mousePos.x,-1,1,40, 80);
     this.camera.updateProjectionMatrix ()
     this.camera.position.y += (this.airplane.mesh.position.y - this.camera.position.y)*this.deltaTime*this.game.cameraSensivity;
@@ -456,7 +439,7 @@ export class GameComponent implements OnInit, AfterViewInit{
     this.game.planeCollisionDisplacementX += (0-this.game.planeCollisionDisplacementX)*this.deltaTime *0.01;
     this.game.planeCollisionSpeedY += (0-this.game.planeCollisionSpeedY)*this.deltaTime * 0.03;
     this.game.planeCollisionDisplacementY += (0-this.game.planeCollisionDisplacementY)*this.deltaTime *0.01;
-
+    // 파일럿의 hairs 날리기
     this.airplane.pilot.updateHairs();
   }
 
@@ -477,12 +460,8 @@ export class GameComponent implements OnInit, AfterViewInit{
     return tv;
   }
 
- 
-
   private init(){
-
-  // UI
-
+    // UI
     this.fieldDistance = document.getElementById("distValue");
     this.energyBar = document.getElementById("energyBar");
     this.replayMessage = document.getElementById("replayMessage");

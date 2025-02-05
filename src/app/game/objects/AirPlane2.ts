@@ -1,8 +1,8 @@
 
 import * as THREE from 'three';
 import { Colors } from './Constants';
-import { Pilot } from './Pilot';
-export class AirPlane {
+import { Pilot2 as Pilot } from './Pilot2';
+export class AirPlane2 {
 
   private parent;
   private mesh;
