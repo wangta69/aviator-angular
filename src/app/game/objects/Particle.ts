@@ -1,6 +1,6 @@
 
 import * as THREE from 'three';
-import { Colors } from './Constants';
+import * as GSAP from 'gsap';
 export class Particle {
 
   private parent;
@@ -29,6 +29,14 @@ export class Particle {
     const targetX = pos.x + (-1 + Math.random()*2)*50;
     const targetY = pos.y + (-1 + Math.random()*2)*50;
     const speed = .6+Math.random()*.2;
+    GSAP.gsap.to(this.mesh.rotation, {duration: speed, x:Math.random()*12, y:Math.random()*12});
+    GSAP.gsap.to(this.mesh.scale, {duration: speed, xx:.1, y:.1, z:.1});
+    GSAP.gsap.to(this.mesh.position, {duration: speed, xx:targetX, y:targetY, delay:Math.random() *.1, ease:GSAP.Power2.easeOut, onComplete:() =>{
+      if(_p) _p.remove(_this.mesh);
+      _this.mesh.scale.set(1,1,1);
+      this.parent.particlesPool.unshift(_this);
+    }});
+    /*
     TweenMax.to(this.mesh.rotation, speed, {x:Math.random()*12, y:Math.random()*12});
     TweenMax.to(this.mesh.scale, speed, {x:.1, y:.1, z:.1});
     TweenMax.to(this.mesh.position, speed, {x:targetX, y:targetY, delay:Math.random() *.1, ease:Power2.easeOut, onComplete:() =>{
@@ -36,5 +44,6 @@ export class Particle {
       _this.mesh.scale.set(1,1,1);
       this.parent.particlesPool.unshift(_this);
     }});
+    */
   }
 }
